@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Books Scraper</title>
+    <title>Парсер книг</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/steps.css">
     <style>
@@ -25,83 +25,201 @@
         .wizard-step.active {
             display: block;
         }
+        .currency-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+        .currency-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 0.25rem 0.25rem;
+        }
     </style>
 </head>
 <body>
 <div class="container mt-5">
-    <h1 class="text-center mb-4">Books.ToScrape Parser</h1>
+    <h1 class="text-center mb-4">Парсер книг Books.ToScrape</h1>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="wizard-container">
-                        <div class="wizard-steps mb-4">
-                            <div class="wizard-step-item active" data-step="1">
-                                <div class="wizard-step-number">1</div>
-                                <div class="wizard-step-label">Выбор категории</div>
-                            </div>
-                            <div class="wizard-step-item" data-step="2">
-                                <div class="wizard-step-number">2</div>
-                                <div class="wizard-step-label">Выбор страницы</div>
-                            </div>
-                            <div class="wizard-step-item" data-step="3">
-                                <div class="wizard-step-number">3</div>
-                                <div class="wizard-step-label">Результаты</div>
-                            </div>
-                        </div>
+    <!-- Вкладки навигации -->
+    <ul class="nav nav-tabs mb-3" id="mainTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="scraper-tab" data-bs-toggle="tab" data-bs-target="#scraper-tab-pane" type="button" role="tab" aria-controls="scraper-tab-pane" aria-selected="true">Парсер</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats-tab-pane" type="button" role="tab" aria-controls="stats-tab-pane" aria-selected="false">Статистика</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="currency-tab" data-bs-toggle="tab" data-bs-target="#currency-tab-pane" type="button" role="tab" aria-controls="currency-tab-pane" aria-selected="false">Курси валют</button>
+        </li>
+    </ul>
 
-                        <div class="wizard-content">
-                            <div class="wizard-step active" id="step1">
-                                <h3 class="mb-3">Выберите категорию книг</h3>
-                                <div class="form-group mb-3">
-                                    <select id="categorySelect" class="form-control">
-                                        <option value="">-- Выберите категорию --</option>
-                                        <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
-                                    </select>
-                                </div>
-                                <div class="d-flex justify-content-end">
-                                    <button class="btn btn-primary btn-next" disabled>Далее</button>
-                                </div>
-                            </div>
-
-                            <div class="wizard-step" id="step2">
-                                <h3 class="mb-3">Выберите страницу</h3>
-                                <div class="form-group mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <label class="me-3">Страница:</label>
-                                        <select id="pageSelect" class="form-control">
-                                            <option value="1">1</option>
-                                        </select>
-                                        <span class="ms-3" id="totalPagesInfo"></span>
+    <!-- Содержимое вкладок -->
+    <div class="tab-content" id="mainTabContent">
+        <!-- Вкладка парсера -->
+        <div class="tab-pane fade show active" id="scraper-tab-pane" role="tabpanel" aria-labelledby="scraper-tab" tabindex="0">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="wizard-container">
+                                <!-- Шаги навигации -->
+                                <div class="wizard-steps mb-4">
+                                    <div class="wizard-step-item active" data-step="1">
+                                        <div class="wizard-step-number">1</div>
+                                        <div class="wizard-step-label">Вибір категорії</div>
+                                    </div>
+                                    <div class="wizard-step-item" data-step="2">
+                                        <div class="wizard-step-number">2</div>
+                                        <div class="wizard-step-label">Вибір сторінки</div>
+                                    </div>
+                                    <div class="wizard-step-item" data-step="3">
+                                        <div class="wizard-step-number">3</div>
+                                        <div class="wizard-step-label">Результати</div>
                                     </div>
                                 </div>
-                                <div class="d-flex justify-content-between">
-                                    <button class="btn btn-secondary btn-prev">Назад</button>
-                                    <button class="btn btn-primary btn-next">Далее</button>
-                                </div>
-                            </div>
 
-                            <div class="wizard-step" id="step3">
-                                <h3 class="mb-3">Результаты парсинга</h3>
-                                <div id="loadingIndicator" class="text-center py-5">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Загрузка...</span>
+                                <!-- Содержимое шагов -->
+                                <div class="wizard-content">
+                                    <!-- Шаг 1: Выбор категории -->
+                                    <div class="wizard-step active" id="step1">
+                                        <h3 class="mb-3">Виберіть категорію книг</h3>
+                                        <div class="form-group mb-3">
+                                            <select id="categorySelect" class="form-control">
+                                                <option value="">-- Виберіть категорію --</option>
+                                                <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
+                                            </select>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button class="btn btn-primary btn-next" disabled>Далі</button>
+                                        </div>
                                     </div>
-                                    <p class="mt-2">Загрузка данных...</p>
-                                </div>
-                                <div id="booksContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                                </div>
-                                <div id="noResultsMessage" class="alert alert-info mt-3" style="display: none;">
-                                    Книги не найдены для выбранной категории и страницы.
-                                </div>
-                                <div class="d-flex justify-content-between mt-4">
-                                    <button class="btn btn-secondary btn-prev">Назад</button>
-                                    <button class="btn btn-success" id="newSearchBtn">Новый поиск</button>
+
+                                    <!-- Шаг 2: Выбор страницы -->
+                                    <div class="wizard-step" id="step2">
+                                        <h3 class="mb-3">Виберіть сторінку</h3>
+                                        <div class="form-group mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <label class="me-3">Сторінка:</label>
+                                                <select id="pageSelect" class="form-control">
+                                                    <option value="1">1</option>
+                                                </select>
+                                                <span class="ms-3" id="totalPagesInfo"></span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-secondary btn-prev">Назад</button>
+                                            <button class="btn btn-primary btn-next">Далі</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Шаг 3: Результаты -->
+                                    <div class="wizard-step" id="step3">
+                                        <h3 class="mb-3">Результати парсингу</h3>
+                                        <div id="exportButtons" class="mb-3">
+                                            <button id="exportExcelBtn" class="btn btn-success">
+                                                <i class="bi bi-file-excel"></i> Експорт в Excel
+                                            </button>
+                                        </div>
+                                        <div id="loadingIndicator" class="text-center py-5">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Завантаження...</span>
+                                            </div>
+                                            <p class="mt-2">Завантаження даних...</p>
+                                        </div>
+                                        <div id="booksContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                                            <!-- Сюда будут добавлены карточки книг -->
+                                        </div>
+                                        <div id="noResultsMessage" class="alert alert-info mt-3" style="display: none;">
+                                            Книги не знайдені для вибраної категорії та сторінки.
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-4">
+                                            <button class="btn btn-secondary btn-prev">Назад</button>
+                                            <button class="btn btn-success" id="newSearchBtn">Новий пошук</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка статистики -->
+        <div class="tab-pane fade" id="stats-tab-pane" role="tabpanel" aria-labelledby="stats-tab" tabindex="0">
+            <div class="d-flex justify-content-between mb-3">
+                <h3>Статистика парсингу</h3>
+                <a href="/export/stats" class="btn btn-success">
+                    <i class="bi bi-file-excel"></i> Експорт статистики в Excel
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Категорія</th>
+                        <th>Кількість книг</th>
+                        <th>Середня ціна</th>
+                        <th>Дата</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="stat : ${parsingStats}">
+                        <td th:text="${stat.categoryName}"></td>
+                        <td th:text="${stat.totalBooks}"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.avgPrice, 1, 2)} + ' £'"></td>
+                        <td th:text="${#temporals.format(stat.timestamp, 'dd-MM-yyyy HH:mm')}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(parsingStats)}">
+                        <td colspan="4" class="text-center">Немає доступної статистики</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Вкладка курсов валют -->
+        <div class="tab-pane fade" id="currency-tab-pane" role="tabpanel" aria-labelledby="currency-tab" tabindex="0">
+            <div class="d-flex justify-content-between mb-3">
+                <h3>Курси валют від ПриватБанку</h3>
+                <div>
+                    <button id="refreshCurrencyBtn" class="btn btn-primary me-2">
+                        <i class="bi bi-arrow-clockwise"></i> Оновити курси
+                    </button>
+                    <a href="/export/currency" class="btn btn-success">
+                        <i class="bi bi-file-excel"></i> Експорт в Excel
+                    </a>
+                </div>
+            </div>
+
+            <div class="row" id="currencyContainer">
+                <div th:each="rate : ${currencyRates}" class="col-md-4 mb-3">
+                    <div class="currency-card">
+                        <h4 th:text="${rate.currencyName}"></h4>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <p class="mb-1">Купівля:</p>
+                                <h5 class="text-success" th:text="${#numbers.formatDecimal(rate.buyRate, 1, 4)} + ' UAH'"></h5>
+                            </div>
+                            <div>
+                                <p class="mb-1">Продаж:</p>
+                                <h5 class="text-danger" th:text="${#numbers.formatDecimal(rate.sellRate, 1, 4)} + ' UAH'"></h5>
+                            </div>
+                        </div>
+                        <p class="text-muted mt-2" th:text="'Оновлено: ' + ${#temporals.format(rate.fetchDate, 'dd-MM-yyyy HH:mm')}"></p>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(currencyRates)}" class="col-12">
+                    <div class="alert alert-info">Немає доступних курсів валют</div>
                 </div>
             </div>
         </div>
@@ -111,7 +229,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Элементы интерфейса
         const steps = document.querySelectorAll('.wizard-step');
         const stepItems = document.querySelectorAll('.wizard-step-item');
         const nextButtons = document.querySelectorAll('.btn-next');
@@ -123,12 +240,14 @@
         const booksContainer = document.getElementById('booksContainer');
         const noResultsMessage = document.getElementById('noResultsMessage');
         const newSearchBtn = document.getElementById('newSearchBtn');
+        const exportExcelBtn = document.getElementById('exportExcelBtn');
+
+        const refreshCurrencyBtn = document.getElementById('refreshCurrencyBtn');
 
         let currentStep = 1;
         let selectedCategory = '';
         let totalPages = 1;
 
-        // Инициализация кнопок перехода
         nextButtons.forEach(button => {
             button.addEventListener('click', () => {
                 if (currentStep === 1) {
@@ -148,19 +267,24 @@
             });
         });
 
-        // Загрузка новых данных при изменении категории
         categorySelect.addEventListener('change', function() {
             nextButtons[0].disabled = !this.value;
         });
 
-        // Кнопка "Новый поиск"
         newSearchBtn.addEventListener('click', () => {
             goToStep(1);
             booksContainer.innerHTML = '';
             noResultsMessage.style.display = 'none';
         });
 
-        // Функция перехода между шагами
+        exportExcelBtn.addEventListener('click', () => {
+            window.location.href = '/export/books?category=' + encodeURIComponent(selectedCategory);
+        });
+
+        refreshCurrencyBtn.addEventListener('click', () => {
+            refreshCurrencyRates();
+        });
+
         function goToStep(stepNumber) {
             if (stepNumber < 1 || stepNumber > steps.length) {
                 return;
@@ -175,13 +299,12 @@
             currentStep = stepNumber;
         }
 
-        // Загрузка общего количества страниц для категории
         function loadTotalPages(category) {
             fetch(`/api/pages?category=${encodeURIComponent(category)}`)
                 .then(response => response.json())
                 .then(data => {
                     totalPages = data;
-                    totalPagesInfo.textContent = `из ${totalPages}`;
+                    totalPagesInfo.textContent = `із ${totalPages}`;
 
                     // Обновляем список страниц
                     pageSelect.innerHTML = '';
@@ -194,11 +317,10 @@
                 })
                 .catch(error => {
                     console.error('Error loading total pages:', error);
-                    alert('Ошибка при загрузке данных о страницах. Пожалуйста, попробуйте снова.');
+                    alert('Помилка при завантаженні даних про сторінки. Будь ласка, спробуйте знову.');
                 });
         }
 
-        // Загрузка списка книг
         function loadBooks(category, page) {
             loadingIndicator.style.display = 'block';
             booksContainer.innerHTML = '';
@@ -225,10 +347,10 @@
                                     <div class="card-body">
                                         <h5 class="card-title">${book.title}</h5>
                                         <p class="card-text">
-                                            <strong>Цена:</strong> ${book.price}<br>
-                                            <strong>Рейтинг:</strong> ${book.rating} звезд<br>
-                                            <strong>Категория:</strong> ${book.category}<br>
-                                            <strong>Наличие:</strong> ${book.availability}
+                                            <strong>Ціна:</strong> ${book.price}<br>
+                                            <strong>Рейтинг:</strong> ${book.rating} зірок<br>
+                                            <strong>Категорія:</strong> ${book.category}<br>
+                                            <strong>Наявність:</strong> ${book.availability}
                                         </p>
                                     </div>
                                 </div>
@@ -239,7 +361,69 @@
                 .catch(error => {
                     loadingIndicator.style.display = 'none';
                     console.error('Error loading books:', error);
-                    alert('Ошибка при загрузке книг. Пожалуйста, попробуйте снова.');
+                    alert('Помилка при завантаженні книг. Будь ласка, спробуйте знову.');
+                });
+        }
+
+        function refreshCurrencyRates() {
+            const currencyContainer = document.getElementById('currencyContainer');
+            currencyContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Завантаження...</span>
+                        </div>
+                        <p class="mt-2">Отримання курсів валют...</p>
+                    </div>
+                `;
+
+            fetch('/api/currency/refresh')
+                .then(response => response.json())
+                .then(rates => {
+                    currencyContainer.innerHTML = '';
+
+                    if (rates.length === 0) {
+                        currencyContainer.innerHTML = `
+                                <div class="col-12">
+                                    <div class="alert alert-info">Немає доступних курсів валют</div>
+                                </div>
+                            `;
+                        return;
+                    }
+
+                    rates.forEach(rate => {
+                        const currencyCard = document.createElement('div');
+                        currencyCard.className = 'col-md-4 mb-3';
+
+                        const date = new Date(rate.fetchDate);
+                        const formattedDate = date.toLocaleString();
+
+                        currencyCard.innerHTML = `
+                                <div class="currency-card">
+                                    <h4>${rate.currencyName}</h4>
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <p class="mb-1">Купівля:</p>
+                                            <h5 class="text-success">${rate.buyRate.toFixed(4)} UAH</h5>
+                                        </div>
+                                        <div>
+                                            <p class="mb-1">Продаж:</p>
+                                            <h5 class="text-danger">${rate.sellRate.toFixed(4)} UAH</h5>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted mt-2">Оновлено: ${formattedDate}</p>
+                                </div>
+                            `;
+
+                        currencyContainer.appendChild(currencyCard);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error refreshing currency rates:', error);
+                    currencyContainer.innerHTML = `
+                            <div class="col-12">
+                                <div class="alert alert-danger">Помилка при отриманні курсів валют</div>
+                            </div>
+                        `;
                 });
         }
     });

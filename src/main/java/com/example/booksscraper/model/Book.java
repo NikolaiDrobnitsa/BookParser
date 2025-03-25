@@ -20,49 +20,48 @@ public class Book {
         this.category = category;
     }
 
-
     public String getTitle() {
         return title;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public String getRating() {
-        return rating;
-    }
-
-    public String getAvailability() {
-        return availability;
-    }
-
-    public String getCategory() {
-        return category;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
+    public String getPrice() {
+        return price;
+    }
+
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
+    public String getRating() {
+        return rating;
+    }
+
     public void setRating(String rating) {
         this.rating = rating;
     }
 
+    public String getAvailability() {
+        return availability;
+    }
+
     public void setAvailability(String availability) {
         this.availability = availability;
+    }
+
+    public String getCategory() {
+        return category;
     }
 
     public void setCategory(String category) {
