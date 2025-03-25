@@ -1,0 +1,64 @@
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.wizard-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 0;
+}
+
+.wizard-step-item {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    text-align: center;
+    color: #6c757d;
+    padding: 0 10px;
+}
+
+.wizard-step-number {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    margin: 0 auto 10px;
+    font-weight: bold;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.wizard-step-label {
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.wizard-step-item.active .wizard-step-number {
+    background-color: #007bff;
+    color: white;
+}
+
+.wizard-step-item.active .wizard-step-label {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.wizard-step-item.completed .wizard-step-number {
+    background-color: #28a745;
+    color: white;
+}
+
+.wizard-step-item.completed .wizard-step-label {
+    color: #28a745;
+}
